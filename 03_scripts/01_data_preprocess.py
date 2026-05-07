@@ -94,3 +94,30 @@ print(f"   最终数据形状: {df.shape}")
 print("\n" + "=" * 100)
 print("数据预处理完成！")
 print("=" * 100)
+# ==================================================
+# 步骤8：计算消费者级特征
+# ==================================================
+print("\n【步骤5】计算消费者级特征...")
+customer_stats = df.groupby('Customer ID').agg({
+    'Purchase Amount (USD)': ['sum', 'mean', 'max'],
+    'Previous Purchases': 'sum'
+}).reset_index()
+customer_stats.columns = ['Customer ID', 'Total_Spending', 'Avg_Spending', 'Max_Spending', 'Total_Purchases']
+customer_stats.to_csv('01_data/processed/customer_stats.csv', index=False)
+print("✅ 消费者特征已保存至: 01_data/processed/customer_stats.csv")
+
+# ==================================================
+# 步骤9：生成处理总结
+# ==================================================
+print("\n【步骤6】生成处理总结...")
+summary = pd.DataFrame({
+    '指标': ['原始行数', '处理后行数', '原始列数', '处理后列数', '消费者数', '平均购买金额', '购买金额范围'],
+    '数值': [
+        len(df), len(df), len(df.columns) - 2, len(df.columns),
+        df['Customer ID'].nunique(),
+        f"${df['Purchase Amount (USD)'].mean():.2f}",
+        f"${df['Purchase Amount (USD)'].min():.2f} - ${df['Purchase Amount (USD)'].max():.2f}"
+    ]
+})
+summary.to_csv('01_data/processed/处理总结.csv', index=False)
+print("✅ 处理总结已保存至: 01_data/processed/处理总结.csv")
